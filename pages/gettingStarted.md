@@ -2,13 +2,11 @@
 
 ## What is Laravel?
 
-**Laravel** is an open-source PHP framework that uses the MVC Architecture.
-
-**Documentation**: Laravel has a very detailed documentation for each version [Check Here.](https://laravel.com/docs/8.x)
+**Laravel** is an open-source PHP framework that uses the MVC Architecture and it has a very detailed documentation for each version [Check Here.](https://laravel.com/docs/8.x)
 
 ## Pre-Installation
 
-Before installing Laravel we need to have PHP, MYSQL installed on the machine. After that we have to install **Composer**: which is a PHP Package Manager that we’ll use to install Laravel and other packages.
+Before installing Laravel we need to have PHP and MYSQL installed on the machine. After that we have to install **Composer**: which is a PHP Package Manager that we’ll use to install Laravel and other packages.
 
 ## Installation
 
@@ -28,7 +26,7 @@ composer global require laravel/installer
 laravel new {app-name}
 ```
 
-## Run The Project
+## Start The Project
 
 Starting a project can be done through CMD using artisan
 
@@ -57,4 +55,4 @@ composer intall
 
 ## Packagist
 
-A repository website for all packages in composer and how to install it. [Here](https://packagist.org/)
+A repository website for all packages in composer and how to install it [Here](https://packagist.org/).
