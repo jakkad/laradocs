@@ -51,6 +51,24 @@ Route::get('/products/{id}', [ProductsController::class, 'show']);
 public function show($id){...}
 ```
 
+## Route Model Binding
+
+When we pass a model ID as a parameter to query the DB looking for it, Laravel provides us an easier alternative by passing the model itself
+
+```php
+use App\Http\Controllers\UserController;
+use App\Models\User;
+ 
+// Route definition...
+Route::get('/users/{user}', [UserController::class, 'show']);
+ 
+// Controller method definition...
+public function show(User $user)
+{
+    return view('user.profile', ['user' => $user]);
+}
+```
+
 ## Parameter Conditions
 
 We can add regular expression to the route to accept specific type of data for the parameter

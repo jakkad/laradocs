@@ -4,6 +4,20 @@ Relationships in Laravel represent the relation between one DB table to another,
 
 Eloquent Relationships are defined as methods inside the model classes, which means that all the chaining and querying capabilities can be applied.
 
+## Pre-requisite
+
+Before adding the relationship we need to make sure to add the foreign key column to our table during creating the migration.
+
+```php
+// Without defining the relation inside DB
+
+$table->unsignedInteger('user_id');
+
+// With defining the relation inside DB
+$table->unsignedInteger('manufactur_id');
+$table->foreign('manufactur_id')->references('id')->on('manufacturs')->onDelete('cascade');
+```
+
 ## One to One
 
 A one-to-one relationship is a very basic type of database relationship. For example, a **`User`** model might be associated with one **`Phone`** model. To define this relationship, we will place a **`phone`** method on the **`User`** model. The **`phone`** method should call the **`hasOne`** method and return its result. The **`hasOne`** method is available to your model via the model's **`Illuminate\Database\Eloquent\Model`** base class:
