@@ -160,22 +160,6 @@ Many fields will also include a placeholder value for when it has no value. You 
 TextInput::make('name')->placeholder('John Doe')
 ```
 
-## Change Field Globally
-
-If you wish to change the default behavior of a field globally, then you can call the static `configureUsing()` method inside a service provider's `boot()` method, to which you pass a Closure to modify the component using. For example, if you wish to make all checkboxes **`[inline(false)](https://filamentphp.com/docs/2.x/forms/fields#checkbox)`**, you can do it like so:
-
-```php
-Checkbox::configureUsing(function (Checkbox $checkbox): void {
-    $checkbox->inline(false);
-});
-```
-
-Of course, you are still able to overwrite this on each field individually:
-
-```php
-Checkbox::make('is_admin')->inline()
-```
-
 ## Field Types
 
 ### Text Input
@@ -681,6 +665,212 @@ Builder\Block::make('heading')
     ->maxItems(10)
 ```
 
+## Layout Options
+
+Layout component classes can be found in the `Filament\Form\Components` namespace.
+
+They reside within the schema of your form, alongside any fields
+
+### Columns
+
+You may create multiple columns within each layout component using the `columns()` method:
+
+```php
+Card::make()->columns(2)
+/* Alternatively For Grid choose columns inside the make */
+Grid::make(3)
+/* Select columns at breakpoints */
+Grid::make([
+    'default' => 1,
+    'sm' => 3,
+    'xl' => 6,
+    '2xl' => 8,
+])
+
+```
+
+You may specify the number of columns that any component may span in the parent grid:
+
+```php
+Grid::make(3)
+    ->schema([
+        TextInput::make('name')
+            ->columnSpan(2),// or we can choose full
+        // ...
+    ])
+```
+
+### Setting an ID
+
+You may define an ID for the component using the `id()` method:
+
+```php
+Card::make()->id('main-card')
+```
+
+### Custom Attributes
+
+The HTML of components can be customized even further, by passing an array of `extraAttributes()`:
+
+```php
+Card::make()->extraAttributes(['class' => 'bg-gray-50'])
+```
+
+## Layout Types
+
+### Grid
+
+Generally, form fields are stacked on top of each other in one column. To change this, you may use a grid component:
+
+```php
+Grid::make()
+    ->schema([
+        // ...
+    ])
+```
+
+### Fieldset
+
+You may want to group fields into a Fieldset. Each fieldset has a label, a border, and a two-column grid by default:
+
+```php
+Fieldset::make('Label')
+    ->schema([
+        // ...
+    ])
+```
+
+### Tabs
+
+Some forms can be long and complex. You may want to use tabs to reduce the number of components that are visible at once:
+
+```php
+Tabs::make('Heading')
+    ->tabs([
+        Tabs\Tab::make('Label 1')
+            ->schema([
+                // ...
+            ]),
+        Tabs\Tab::make('Label 2')
+            ->schema([
+                // ...
+            ]),
+        Tabs\Tab::make('Label 3')
+            ->schema([
+                // ...
+            ]),
+    ])
+/* Select Default tab */
+	->activeTab(2)
+/* Set Icon and Badge for the tab */
+Tabs\Tab::make('Notifications')
+            ->icon('heroicon-o-bell') 
+            ->badge('39') 
+            ->schema([
+                // ...
+            ]),
+
+```
+
+### Wizard
+
+Similar to **[tabs](https://filamentphp.com/docs/2.x/forms/layout#tabs)**, you may want to use a multistep form wizard to reduce the number of components that are visible at once. These are especially useful if your form has a definite chronological order, in which you want each step to be validated as the user progresses.
+
+```php
+Wizard::make([
+    Wizard\Step::make('Order')
+        ->schema([
+            // ...
+        ]),
+    Wizard\Step::make('Delivery')
+        ->schema([
+            // ...
+        ]),
+    Wizard\Step::make('Billing')
+        ->schema([
+            // ...
+        ]),
+])
+/* Add icon to a step */
+	->icon('heroicon-o-shopping-bag')
+/* Choose the starting step */
+	->startOnStep(2)
+/* Make a step skippable */
+	->skippable()
+```
+
+### Section
+
+You may want to separate your fields into sections, each with a heading and description. To do this, you can use a section component:
+
+```php
+Section::make('Heading')
+    ->description('Description')
+    ->schema([
+        // ...
+    ])
+/* Collapsiable */
+		->collapsible()
+		->collapsed()
+/* Compact Style */
+		->compact()
+```
+
+### Placeholder
+
+Placeholders can be used to render text-only "fields" within your forms. Each placeholder has `content()`, which cannot be changed by the user.
+
+```php
+Placeholder::make('Label')
+    ->content('Content, displayed underneath the label')
+/* We can render custom HTML */
+Placeholder::make('Documentation')
+    ->content(new HtmlString('<a href="https://filamentphp.com/docs">filamentphp.com</a>'))
+```
+
+### Card
+
+The card component may be used to render the form components inside a card:
+
+```php
+Card::make()
+    ->schema([
+        // ...
+    ])
+```
+
+### View
+
+Aside from **[building custom layout components](https://filamentphp.com/docs/2.x/forms/layout#building-custom-layout-components)**, you may create "view" components which allow you to create custom layouts without extra PHP classes.
+
+```php
+View::make('filament.forms.components.wizard')
+```
+
+Inside your view, you may render the component's schema() using the $getChildComponentContainer() closure:
+
+```php
+<div>
+    {{ $getChildComponentContainer() }}
+</div>
+```
+
+## Change Field or Layout Globally
+
+If you wish to change the default behavior of a field or Layout globally, then you can call the static `configureUsing()` method inside a service provider's `boot()` method, to which you pass a Closure to modify the component using. For example, if you wish to make all checkboxes **`[inline(false)](https://filamentphp.com/docs/2.x/forms/fields#checkbox)`**, you can do it like so:
+
+```php
+Checkbox::configureUsing(function (Checkbox $checkbox): void {
+    $checkbox->inline(false);
+});
+```
+
+Of course, you are still able to overwrite this on each field individually:
+
+```php
+Checkbox::make('is_admin')->inline()
+```
+
 ## Advanced Form Functions
 
 ### Use Callback to Fetch Select **or MutliSelect** Options
@@ -758,3 +948,61 @@ The form opens in a modal, where the user can fill it with data. Upon form submi
 Commonly, you may desire "dependant" select inputs, which populate their options based on the state of another.
 
 [https://www.youtube.com/watch?time_continue=2&v=W_eNyimRi3w&feature=emb_logo](https://www.youtube.com/watch?time_continue=2&v=W_eNyimRi3w&feature=emb_logo)
+
+### Saving Layout data to Relationships
+
+You may load and save the contents of a layout component to a `HasOne`, `BelongsTo` or `MorphOne` Eloquent relationship, using the `relationship()` method:
+
+```php
+Fieldset::make('Metadata')
+    ->relationship('metadata')
+    ->schema([
+        TextInput::make('title'),
+        Textarea::make('description'),
+        FileUpload::make('image'),
+    ])
+```
+
+In this example, the `title`, `description` and `image` is automatically loaded from saved to the `metadata` relationship, and saved again when the form is submitted. If the `metadata` record does not exist, it is automatically created.
+
+## Validation
+
+Validation rules may be added to any **[field](https://filamentphp.com/docs/2.x/forms/fields)**.
+
+Filament includes several **[dedicated validation methods](https://filamentphp.com/docs/2.x/forms/validation#available-rules)**, but you can also use any **[other Laravel validation rules](https://filamentphp.com/docs/2.x/forms/validation#other-rules)**, including **[custom validation rules](https://filamentphp.com/docs/2.x/forms/validation#custom-rules)**
+
+### Available Rules
+
+Full List of All validation Rules Here [https://filamentphp.com/docs/2.x/forms/validation#available-rules](https://filamentphp.com/docs/2.x/forms/validation#available-rules)
+
+### Other Rules
+
+You may add other validation rules to any field using the `rules()` method:
+
+```php
+TextInput::make('slug')->rules(['alpha_dash'])
+```
+
+A full list of validation rules may be found in the **[Laravel documentation](https://laravel.com/docs/validation#available-validation-rules)**.
+
+### Custom Rules
+
+You may use any custom validation rules as you would do in **[Laravel](https://laravel.com/docs/validation#custom-validation-rules)**:
+
+```php
+TextInput::make('slug')->rules([new Uppercase()])
+```
+
+You may also use **[closure rules](https://laravel.com/docs/validation#using-closures)**:
+
+```php
+TextInput::make('slug')->rules([
+    function () {
+        return function (string $attribute, $value, Closure $fail) {
+            if ($value === 'foo') {
+                $fail("The {$attribute} is invalid.");
+            }
+        };
+    },
+])
+```
