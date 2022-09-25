@@ -27,7 +27,7 @@ public static function table(Table $table): Table
 }
 ```
 
-## Columns
+## Columns Options
 
 Columns may be created using the static `make()` method, passing its name. The name of the column should correspond to a column or accessor on your model. You may use "dot syntax" to access columns within relationships.
 
@@ -66,6 +66,29 @@ TextColumn::make('title')->searchable()
 /* Stop global search */
 ->searchable(isIndividual: true, isGlobal: false)
 
+```
+
+### Reordering Records
+
+To allow the user to reorder records using drag and drop in your table, you can use the `reorderable()` method:
+
+```php
+return $table
+    // ...
+    ->reorderable('sort');
+
+```
+
+When making the table reorderable, a new button will be available on the table to toggle reordering. Pagination will be disabled in reorder mode to allow you to move records between pages. The `reorderable()` method passes in the name of a column to store the record order in.
+
+### Polling Content
+
+You may poll table content so that it refreshes at a set interval, using the `poll()` method:
+
+```php
+  return $table
+      // ...
+      ->poll('10s');
 ```
 
 ### Cell Actions and URLs
