@@ -1,4 +1,4 @@
-# Form Builder
+# Basics
 
 Resource classes contain a static `form()` method that is used to build the forms on the Create and Edit pages.
 
@@ -23,6 +23,8 @@ Fields may be created using the static `make()` method, passing its name. Whic
 ```php
 TextInput::make('name')
 ```
+
+# Fields
 
 ## Fields Options
 
@@ -489,7 +491,9 @@ By default, the component uses HEX format:
 ColorPicker::make('color')
 ```
 
-## Repeater
+## Advanced Fields
+
+### Repeater
 
 The repeater component allows you to output a JSON array of repeated form components.
 
@@ -510,7 +514,7 @@ Repeater::make('members')
 
 We recommend that you store repeater data with a `JSON` column in your database. Additionally, if you're using Eloquent, make sure that column has an `array` cast.
 
-### Options
+**Options**
 
 Repeater has multiple options to modify
 
@@ -531,7 +535,7 @@ Repeater::make('members')
     ->disableItemMovement()
 ```
 
-### Collapsible
+**Collapsible**
 
 The repeater may be `collapsible()` to optionally hide content in long forms:
 
@@ -545,7 +549,7 @@ Repeater::make('qualifications')
 		->collapsed()
 ```
 
-### Clone Items
+**Clone Items**
 
 You may allow repeater items to be duplicated using the `cloneable()` method:
 
@@ -553,7 +557,7 @@ You may allow repeater items to be duplicated using the `cloneable()` method:
 ->cloneable()
 ```
 
-### Grid Layout
+**Grid Layout**
 
 You may organize repeater items into columns by using the `grid()` method:
 
@@ -561,7 +565,7 @@ You may organize repeater items into columns by using the `grid()` method:
 ->grid(2) // This method accepts the same options as the columns() method of the grid.
 ```
 
-### ****Using `$get()` to access parent field values**
+**Access Parent Values**
 
 All form components are able to **[use `$get()` and `$set()`](https://filamentphp.com/docs/2.x/forms/advanced)** to access another field's value. However, you might experience unexpected behaviour when using this inside the repeater's schema.
 
@@ -590,7 +594,7 @@ You are trying to retrieve the value of `client_id` from inside the repeater i
 
 You can use `../` to go up a level in the data structure, so `$get('../client_id')` is $get('repeater.client_id') and `$get('../../client_id')` is `$get('client_id')`.
 
-## Builder
+### Builder
 
 Similar to a **[repeater](https://filamentphp.com/docs/2.x/forms/fields#repeater)**, the builder component allows you to output a JSON array of repeated form components. Unlike the repeater, which only defines one form schema to repeat, the builder allows you to define different schema "blocks", which you can repeat in any order. This makes it useful for building more advanced array structures.
 
@@ -650,7 +654,7 @@ Builder::make('content')
     ])
 ```
 
-### Options
+**Options**
 
 Builder has multiple options to manipulate
 
@@ -664,6 +668,8 @@ Builder\Block::make('heading')
     ->minItems(1)
     ->maxItems(10)
 ```
+
+# Layout
 
 ## Layout Options
 
@@ -855,6 +861,8 @@ Inside your view, you may render the component's schema() using the $getChildCom
 </div>
 ```
 
+# Advanced
+
 ## Change Field or Layout Globally
 
 If you wish to change the default behavior of a field or Layout globally, then you can call the static `configureUsing()` method inside a service provider's `boot()` method, to which you pass a Closure to modify the component using. For example, if you wish to make all checkboxes **`[inline(false)](https://filamentphp.com/docs/2.x/forms/fields#checkbox)`**, you can do it like so:
@@ -871,111 +879,17 @@ Of course, you are still able to overwrite this on each field individually:
 Checkbox::make('is_admin')->inline()
 ```
 
-## Advanced Form Functions
-
-### Use Callback to Fetch Select **or MutliSelect** Options
-
-If you have lots of options and want to populate them based on a database search or other external data source, you can use the `getSearchResultsUsing()` and `getOptionLabelUsing()` methods instead of `options()`. The `getSearchResultsUsing()` method accepts a callback that returns search results in `$key => $value` format.
-
-The `getOptionLabelUsing()` method accepts a callback that transforms the selected option `$value` into a label.
-
-```php
-Select::make('authorId')
-    ->searchable()
-    ->getSearchResultsUsing(fn (string $search) => User::where('name', 'like', "%{$search}%")->limit(50)->pluck('name', 'id'))
-    ->getOptionLabelUsing(fn ($value): ?string => User::find($value)?->name),
-
-```
-
-### **Populating automatically from a relationship**
-
-> This Can be applied on Select, MultiSelect, Checkbox List, or Repeater
->
-
-You may employ the `relationship()` method of the `Select` to configure a `BelongsTo` relationship to automatically retrieve and save options from:
-
-```php
-Select::make('authorId')
-    ->relationship('author', 'name')
-```
-
-You may customize the database query that retrieves options using the third parameter of the `relationship()` method:
-
-```php
-Select::make('authorId')
-    ->relationship('author', 'name', fn (Builder $query) => $query->withTrashed())
-```
-
-If you'd like to customize the label of each option, maybe to be more descriptive, or to concatenate a first and last name, you should use a virtual column in your database migration:
-
-```php
-$table->string('full_name')->virtualAs('concat(first_name, \' \', last_name)');
-```
-
-```php
-Select::make('authorId')
-    ->relationship('author', 'full_name')
-```
-
-****Ordering items in Repeater****
-
-By default, ordering relationship repeater items is disabled. This is because your related model needs an `sort` column to store the order of related records. To enable ordering, you may use the `orderable()` method:
-
-```php
-->orderable() // we can pass column name
-```
-
-This assumes that your related model has a `sort` column.
-
-### Create Parent’s Option From within the child’s Select
-
-You may define a custom form that can be used to create a new record and attach it to the `BelongsTo` relationship:
-
-```php
-
-Select::make('authorId')
-    ->relationship('author', 'name')
-    ->createOptionForm([
-        Forms\Components\TextInput::make('name')
-            ->required(),
-    ]),
-```
-
-The form opens in a modal, where the user can fill it with data. Upon form submission, the new record is selected by the field.
-
-### **Dependent selects**
-
-Commonly, you may desire "dependant" select inputs, which populate their options based on the state of another.
-
-[https://www.youtube.com/watch?time_continue=2&v=W_eNyimRi3w&feature=emb_logo](https://www.youtube.com/watch?time_continue=2&v=W_eNyimRi3w&feature=emb_logo)
-
-### Saving Layout data to Relationships
-
-You may load and save the contents of a layout component to a `HasOne`, `BelongsTo` or `MorphOne` Eloquent relationship, using the `relationship()` method:
-
-```php
-Fieldset::make('Metadata')
-    ->relationship('metadata')
-    ->schema([
-        TextInput::make('title'),
-        Textarea::make('description'),
-        FileUpload::make('image'),
-    ])
-```
-
-In this example, the `title`, `description` and `image` is automatically loaded from saved to the `metadata` relationship, and saved again when the form is submitted. If the `metadata` record does not exist, it is automatically created.
-
-## Validation
+# Validation
 
 Validation rules may be added to any **[field](https://filamentphp.com/docs/2.x/forms/fields)**.
 
 Filament includes several **[dedicated validation methods](https://filamentphp.com/docs/2.x/forms/validation#available-rules)**, but you can also use any **[other Laravel validation rules](https://filamentphp.com/docs/2.x/forms/validation#other-rules)**, including **[custom validation rules](https://filamentphp.com/docs/2.x/forms/validation#custom-rules)**
 
-### Available Rules
+## Available Rules
 
 Full List of All validation Rules Here [https://filamentphp.com/docs/2.x/forms/validation#available-rules](https://filamentphp.com/docs/2.x/forms/validation#available-rules)
 
-### Other Rules
+## Other Rules
 
 You may add other validation rules to any field using the `rules()` method:
 
@@ -985,7 +899,7 @@ TextInput::make('slug')->rules(['alpha_dash'])
 
 A full list of validation rules may be found in the **[Laravel documentation](https://laravel.com/docs/validation#available-validation-rules)**.
 
-### Custom Rules
+## Custom Rules
 
 You may use any custom validation rules as you would do in **[Laravel](https://laravel.com/docs/validation#custom-validation-rules)**:
 
