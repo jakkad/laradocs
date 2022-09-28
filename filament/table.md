@@ -1,4 +1,4 @@
-# Table Builder
+# Basics
 
 ## Table Structure
 
@@ -51,6 +51,22 @@ You may poll table content so that it refreshes at a set interval, using the `p
       // ...
       ->poll('10s');
 ```
+
+### Access Relationship’s fields
+
+You may use "dot syntax" to access columns within relationships. The name of the relationship comes first, followed by a period, followed by the name of the column to display:
+
+```php
+TextColumn::make('author.name')
+/* Number of related records */
+->counts('users')
+/* Check if relationship exist */
+->exists('users')
+/* Relationship Aggregating: avg(), max(), min(), sum() */
+->avg('users', 'age')
+```
+
+# Columns
 
 ## Columns Options
 
@@ -422,21 +438,7 @@ The checkbox column allows you to render a checkbox inside the table, which can 
 CheckboxColumn::make('is_admin')
 ```
 
-### Custom Relationships
-
-You may use "dot syntax" to access columns within relationships. The name of the relationship comes first, followed by a period, followed by the name of the column to display:
-
-```php
-TextColumn::make('author.name')
-/* Number of related records */
-->counts('users')
-/* Check if relationship exist */
-->exists('users')
-/* Relationship Aggregating: avg(), max(), min(), sum() */
-->avg('users', 'age')
-```
-
-## Filters
+# Filters
 
 Filters allow you to scope the Eloquent query as a way to reduce the number of records in a table.
 
@@ -457,7 +459,7 @@ Filter::make('is_featured')
     ->query(fn (Builder $query): Builder => $query->where('is_featured', true))
 ```
 
-### Filter Options
+## Filter Options
 
 Similar to all other components in Filament, we can modify a number of label’s options
 
@@ -468,7 +470,7 @@ Filter::make('is_featured')->label('Featured') // change label
 ->default() // set a filter to be enabled by default
 ```
 
-### Select / MultiSelect filters
+## Select / MultiSelect filters
 
 By default, filters have two states: enabled and disabled. When the filter is enabled, it is applied to the query. When it is disabled it is not. This is controlled through a checkbox. However, some filters may require extra data input to narrow down the results further. You may use a custom filter form to collect this data.
 
@@ -483,7 +485,7 @@ SelectFilter::make('status') // or MultiSelectFilter
     ->attribute('status_id')
 ```
 
-### Relationship Select Filters
+## Relationship Select Filters
 
 Select filters are also able to automatically populate themselves based on a `BelongsTo` relationship. For example, if your table has a `author` relationship with a `name` column, you may use `relationship()` to filter the records belonging to an author:
 
@@ -494,7 +496,7 @@ SelectFilter::make('author')->relationship('author', 'name') // or MultiSelect
 ->relationship('author', 'name', fn (Builder $query) => $query->withTrashed())
 ```
 
-### Ternary Filters
+## Ternary Filters
 
 Ternary filters allow you to quickly create a filter which has three states - usually true, false and blank. To filter a column named `is_admin` to be `true` or `false`, you may use the ternary filter:
 
@@ -520,7 +522,7 @@ TernaryFilter::make('email_verified_at')
     )
 ```
 
-### Custom Filter Forms
+## Custom Filter Forms
 
 You may use components from the **[Form Builder](https://filamentphp.com/docs/forms/fields)** to create custom filter forms. The data from the custom filter form is available in the `$data` array of the `query()` callback:
 
@@ -549,6 +551,8 @@ Filter::make('created_at')
         Forms\Components\DatePicker::make('created_until')->default(now()),
     ])
 ```
+
+## Indicators
 
 ### Active Indicators
 
@@ -605,7 +609,7 @@ Filter::make('created_at')
     })
 ```
 
-### Appearance
+## Appearance
 
 By default, filters are displayed in a thin popover on the right side of the table, in 1 column.
 
@@ -627,7 +631,7 @@ protected function getTableFiltersFormWidth(): string
 }
 ```
 
-### ****Displaying filters above or below the table content****
+## ****Displaying filters above or below the table content****
 
 To render the filters above the table content instead of in a popover, you may use:
 
@@ -647,7 +651,7 @@ protected function getTableFiltersLayout(): ?string
 }
 ```
 
-### Persist Filters in Session
+## Persist Filters in Session
 
 To persist the table filters in the user's session, use the `shouldPersistTableFiltersInSession()` method:
 
@@ -658,7 +662,7 @@ protected function shouldPersistTableFiltersInSession(): bool
 }
 ```
 
-## Actions
+# Actions
 
 Single action buttons are rendered at the end of each table row.
 
@@ -679,7 +683,7 @@ BulkAction::make('delete')
     ->action(fn (Collection $records) => $records->each->delete())
 ```
 
-### Action Options
+## Action Options
 
 Actions have multiple options to modify as follows:
 
@@ -690,7 +694,7 @@ Actions have multiple options to modify as follows:
 ->icon('heroicon-o-trash') // icon
 ```
 
-### ****Confirmation modals****
+## ****Confirmation modals****
 
 You may require confirmation before an action is run using the `requiresConfirmation()` method. This is useful for particularly destructive actions, such as those that delete records.
 
@@ -698,11 +702,11 @@ You may require confirmation before an action is run using the `requiresConfirm
 ->requiresConfirmation()
 ```
 
-### Custom Forms
+## Custom Forms
 
 You may also render a form in this modal to collect extra information from the user before the action runs. Details [Here](https://filamentphp.com/docs/2.x/tables/actions#custom-forms)
 
-### Authorization
+## Authorization
 
 You may conditionally show or hide actions and bulk actions for certain users using either the `visible()` or `hidden()` methods, passing a closure:
 
@@ -712,7 +716,7 @@ Action::make('edit')
     ->visible(fn (Post $record): bool => auth()->user()->can('update', $record))
 ```
 
-### Prebuilt Actions
+## Prebuilt Actions
 
 Filament offers the main actions (View, Edit, Delete) as well as a **Replicate Action**
 
@@ -735,7 +739,7 @@ ReplicateAction::make()
     ])
 ```
 
-### Grouping
+## Grouping
 
 You may use an `ActionGroup` object to group multiple table actions together in a dropdown:
 
@@ -748,7 +752,7 @@ You may use an `ActionGroup` object to group multiple table actions together i
 
 ```
 
-### Position
+## Position
 
 By default, the row actions in your table are rendered in the final cell. You may change the position by overriding the `getTableActionsPosition()` method:
 
@@ -759,7 +763,7 @@ protected function getTableActionsPosition(): ?string
 }
 ```
 
-### Alignment
+## Alignment
 
 Row actions are aligned to the right in their cell by default. To change the alignment, update the configuration value inside of the package config:
 
@@ -771,7 +775,7 @@ Row actions are aligned to the right in their cell by default. To change the ali
 ]
 ```
 
-### Tooltips
+## Tooltips
 
 You may specify a tooltip to display when you hover over an action:
 
@@ -781,7 +785,7 @@ You may specify a tooltip to display when you hover over an action:
 ->tooltip(fn (Model $record): string => "Edit {$record->title}")
 ```
 
-## Layout
+# Layout
 
 Table layout always suffer on mobile from the responsive issue, so Filament provides two out of the box features to help
 
@@ -793,7 +797,7 @@ Table layout always suffer on mobile from the responsive issue, so Filament prov
     ```
 
 
-### Allowing Columns to Stack on Mobile
+## Allowing Columns to Stack on Mobile
 
 Filament provides split component to allow stacking on mobile
 
@@ -830,7 +834,7 @@ Stack::make([
     ])->alignment('right')->visibleFrom('md'),,
 ```
 
-### Collapsible Content
+## Collapsible Content
 
 When you're using a column layout like split or stack, then you can also add collapsible content. This is very useful for when you don't want to display all data in the table at once, but still want it to be accessible to the user if they need to access it, without navigating away.
 
@@ -847,7 +851,7 @@ Panel::make([
 
 We need to add the animation manually details [here](https://filamentphp.com/docs/2.x/tables/layout#adding-a-collapse-animation)
 
-### Arranging Records into a grid
+## Arranging Records into a grid
 
 Sometimes, you may find that your data fits into a grid format better than a list. Filament can handle that too!
 
@@ -859,7 +863,7 @@ return $table
         ]);
 ```
 
-### Custom HTML
+## Custom HTML
 
 You may add custom HTML to your table using a `View` component. It can even be `collapsible()`
 
