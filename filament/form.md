@@ -879,6 +879,40 @@ Of course, you are still able to overwrite this on each field individually:
 Checkbox::make('is_admin')->inline()
 ```
 
+## Customizing data before saving
+
+Sometimes, you may wish to modify form data before it is finally saved to the database. To do this, you may define a `mutateFormDataBeforeCreate()` method, which accepts the `$data` as an array, and returns the modified version:
+
+```php
+protected function mutateFormDataBeforeCreate(array $data): array
+{
+    $data['user_id'] = auth()->id();
+ 
+    return $data;
+}
+```
+
+> Edit and view has similar function that can be used.
+>
+
+## Customizing form redirects
+
+By default, after saving the form, the user will be redirected to the **[Edit page](https://filamentphp.com/docs/2.x/admin/resources/editing-records)** of the resource, or the **[View page](https://filamentphp.com/docs/2.x/admin/resources/viewing-records)** if it is present.
+
+You may set up a custom redirect when the form is saved by overriding the `getRedirectUrl()` method.
+
+For example, the form can redirect back to the **[List page](https://filamentphp.com/docs/2.x/admin/resources/listing-records)**:
+
+```php
+protected function getRedirectUrl(): string
+{
+    return $this->getResource()::getUrl('index');
+}
+```
+
+> This function will be added to the create or edit resource pages
+>
+
 # Validation
 
 Validation rules may be added to any **[field](https://filamentphp.com/docs/2.x/forms/fields)**.

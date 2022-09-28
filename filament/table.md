@@ -96,6 +96,14 @@ TextColumn::make('title')->sortable()
 
 custom sort is available [here](https://filamentphp.com/docs/2.x/tables/columns/getting-started#sorting)
 
+**Sorting column by default**
+
+We add it to the table function
+
+```php
+->defaultSort('name');
+```
+
 ### Searching
 
 Columns may be searchable, by using the text input in the top right of the table. To make a column searchable, you must use the `searchable()` method:
@@ -664,6 +672,8 @@ protected function shouldPersistTableFiltersInSession(): bool
 
 # Actions
 
+## Single Actions
+
 Single action buttons are rendered at the end of each table row.
 
 Actions may be created using the static `make()` method, passing its name. The name of the action should be unique. You can then pass a callback to `action()` which executes the task, or a callback to `url()` which generates a link URL:
@@ -683,7 +693,7 @@ BulkAction::make('delete')
     ->action(fn (Collection $records) => $records->each->delete())
 ```
 
-## Action Options
+### Options
 
 Actions have multiple options to modify as follows:
 
@@ -694,7 +704,7 @@ Actions have multiple options to modify as follows:
 ->icon('heroicon-o-trash') // icon
 ```
 
-## ****Confirmation modals****
+### ****Confirmation modals****
 
 You may require confirmation before an action is run using the `requiresConfirmation()` method. This is useful for particularly destructive actions, such as those that delete records.
 
@@ -702,11 +712,11 @@ You may require confirmation before an action is run using the `requiresConfirm
 ->requiresConfirmation()
 ```
 
-## Custom Forms
+### Custom Forms
 
 You may also render a form in this modal to collect extra information from the user before the action runs. Details [Here](https://filamentphp.com/docs/2.x/tables/actions#custom-forms)
 
-## Authorization
+### Authorization
 
 You may conditionally show or hide actions and bulk actions for certain users using either the `visible()` or `hidden()` methods, passing a closure:
 
@@ -716,7 +726,7 @@ Action::make('edit')
     ->visible(fn (Post $record): bool => auth()->user()->can('update', $record))
 ```
 
-## Prebuilt Actions
+### Prebuilt Actions
 
 Filament offers the main actions (View, Edit, Delete) as well as a **Replicate Action**
 
@@ -739,7 +749,7 @@ ReplicateAction::make()
     ])
 ```
 
-## Grouping
+### Grouping
 
 You may use an `ActionGroup` object to group multiple table actions together in a dropdown:
 
@@ -752,7 +762,7 @@ You may use an `ActionGroup` object to group multiple table actions together i
 
 ```
 
-## Position
+### Position
 
 By default, the row actions in your table are rendered in the final cell. You may change the position by overriding the `getTableActionsPosition()` method:
 
@@ -763,7 +773,7 @@ protected function getTableActionsPosition(): ?string
 }
 ```
 
-## Alignment
+### Alignment
 
 Row actions are aligned to the right in their cell by default. To change the alignment, update the configuration value inside of the package config:
 
@@ -775,7 +785,7 @@ Row actions are aligned to the right in their cell by default. To change the ali
 ]
 ```
 
-## Tooltips
+### Tooltips
 
 You may specify a tooltip to display when you hover over an action:
 
@@ -783,6 +793,23 @@ You may specify a tooltip to display when you hover over an action:
 ->tooltip('Edit this blog post')
 /* or use closure to access current table record */
 ->tooltip(fn (Model $record): string => "Edit {$record->title}")
+```
+
+## Bulk Actions
+
+**[Bulk actions](https://filamentphp.com/docs/2.x/tables/actions#bulk-actions)** are buttons that are rendered in a dropdown in the header of the table. They appear when you select records using the checkboxes at the start of each table row. They allow the user to perform a task on multiple records at once in the table. To learn how to build bulk actions, see the **[full actions documentation](https://filamentphp.com/docs/2.x/tables/actions#bulk-actions)**.
+
+To add bulk actions before the "Delete selected" action, use the `$table->prependBulkActions()` method:
+
+```php
+->bulkActions([
+            // ...
+            Tables\Actions\BulkAction::make('activate')
+                ->action(fn (Collection $records) => $records->each->activate())
+                ->requiresConfirmation()
+                ->color('success')
+                ->icon('heroicon-o-check'),
+        ]);
 ```
 
 # Layout
