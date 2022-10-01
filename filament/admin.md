@@ -1028,6 +1028,12 @@ Details about more customization [here](https://filamentphp.com/docs/2.x/admin/n
 
 Details about that [here](https://filamentphp.com/docs/2.x/admin/navigation#customizing-the-user-menu)
 
+# Dashboard
+
+# Appearance
+
+# Users
+
 # Configurations
 
 ## Deploy to Production
