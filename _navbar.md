@@ -1,4 +1,4 @@
 <!-- _navbar.md -->
 
 * [Laravel](/)
-* [Filament](/filament)
+* [Filament](/filament/gettingStarted.md)
