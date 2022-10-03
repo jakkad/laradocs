@@ -4,9 +4,7 @@ Resource classes contain a static `form()` method that is used to build the fo
 
 ## Form Structure
 
-The `schema()` method is used to define the structure of your form. It is an array of **[fields](https://filamentphp.com/docs/2.x/forms/fields)**, in the order they should appear in your form. Filament offers many types of fields (in the Form Section) as well as the ability to create custom form fields.
-
-Also Filament offers layout components to group fields and also we can create custom layout components.
+The `schema()` method is used to define the structure of your form. It is an array of **[fields](https://filamentphp.com/docs/2.x/forms/fields)**, in the order they should appear in your form. We can use both fields and layout (used to group fields) inside the schema
 
 ```php
 public static function form(Form $form): Form
@@ -26,143 +24,7 @@ TextInput::make('name')
 
 # Fields
 
-## Fields Options
-
-Filament provides number of option to alter fields inside the form
-
-### Setting a label
-
-By default, the label of the field will be automatically determined based on its name. To override the field's label, you may use the `label()` method. Customizing the label in this way is useful if you wish to use a **[translation string for localization](https://laravel.com/docs/localization#retrieving-translation-strings)**:
-
-```php
-TextInput::make('name')->label(__('fields.name'))
-```
-
-Optionally, you can have the label automatically translated by using the `translateLabel()` method:
-
-```php
-TextInput::make('name')->translateLabel() // Equivalent to `label(__('Name'))`
-```
-
-### Setting an ID
-
-In the same way as labels, field IDs are also automatically determined based on their names. To override a field ID, use the `id()` method:
-
-```php
-TextInput::make('name')->id('name-field')
-```
-
-### Validation attributes
-
-When fields fail validation, their label is used in the error message. To customize the label used in field error messages, use the `validationAttribute()` method:
-
-```php
-TextInput::make('name')->validationAttribute('full name')
-```
-
-### Setting a default value
-
-Fields may have a default value. This will be filled if the **[form's `fill()` method](https://filamentphp.com/docs/2.x/forms/getting-started#default-data)** is called without any arguments. To define a default value, use the `default()` method:
-
-```php
-TextInput::make('name')->default('John')
-```
-
-### Helper messages and hints
-
-Sometimes, you may wish to provide extra information for the user of the form. For this purpose, you may use helper messages and hints.
-
-Help messages are displayed below the field. The `helperText()` method supports Markdown formatting:
-
-```php
-TextInput::make('name')->helperText('Your full name here, including any middle names.')
-```
-
-Hints can be used to display text adjacent to its label:
-
-```php
-TextInput::make('password')->hint('[Forgotten your password?](forgotten-password)')
-```
-
-Hints may also have an icon rendered next to them:
-
-```php
-RichEditor::make('content')
-    ->hint('Translatable')
-    ->hintIcon('heroicon-s-translate')
-```
-
-### Custom attributes
-
-The HTML attributes of the field's wrapper can be customized by passing an array of `extraAttributes()`:
-
-```php
-TextInput::make('name')->extraAttributes(['title' => 'Text input'])
-```
-
-To add additional HTML attributes to the input itself, use `extraInputAttributes()`:
-
-```php
-TextInput::make('points')
-    ->numeric()
-    ->extraInputAttributes(['step' => '10'])
-```
-
-### Disabling
-
-You may disable a field to prevent it from being edited:
-
-```php
-TextInput::make('name')->disabled()
-```
-
-Optionally, you may pass a boolean value to control if the field should be disabled or not:
-
-```php
-Toggle::make('is_admin')->disabled(! auth()->user()->isAdmin())
-```
-
-Please note that disabling a field does not prevent it from being saved, and a skillful user could manipulate the HTML of the page and alter its value.
-
-To prevent a field from being saved, use the `dehydrated(false)` method:
-
-```php
-Toggle::make('is_admin')->dehydrated(false)
-```
-
-Alternatively, you may only want to save a field conditionally, maybe if the user is an admin:
-
-```php
-Toggle::make('is_admin')
-    ->disabled(! auth()->user()->isAdmin())
-    ->dehydrated(auth()->user()->isAdmin())
-```
-
-If you're using the **[admin panel](https://filamentphp.com/docs/admin)** and only want to save disabled fields on the **[Create page of a resource](https://filamentphp.com/docs/admin/resources)**:
-
-```php
-TextInput::make('slug')
-    ->disabled()
-    ->dehydrated(fn (Page $livewire) => $livewire instanceof CreateRecord)
-```
-
-### Autofocusing
-
-Most fields will be autofocusable. Typically, you should aim for the first significant field in your form to be autofocused for the best user experience.
-
-```php
-TextInput::make('name')->autofocus()
-```
-
-### Setting a placeholder
-
-Many fields will also include a placeholder value for when it has no value. You may customize this using the `placeholder()` method:
-
-```php
-TextInput::make('name')->placeholder('John Doe')
-```
-
-## Field Types
+## Simple Fields
 
 ### Text Input
 
@@ -224,6 +86,9 @@ Select::make('status')
     ->disablePlaceholderSelection()
 
 ```
+
+> Select field has multiple function for advanced usage that can be checked in `Advanced Functions Section`
+>
 
 ### Multi-select
 
@@ -399,6 +264,14 @@ FileUpload::make('attachments')->multiple()
 		->enableDownload()
 ```
 
+> We need to modify the disk for it to work and the easiest way is to store in public folder, to do that we need to do the following steps
+1. in .env file we change `APP_URL=http://127.0.0.1:8000`
+2. in .env file we change `FILESYSTEM_DISK=public`
+3. in config→filesystems we change public so the `'root' => public_path(),`  and `'url' => env('APP_URL').'',`
+4. in filament config we change default disk to public
+5. On the image field inside resource we choose the folder to save in it `->directory('images')`
+>
+
 ### Rich Editor
 
 The rich editor allows you to edit and preview HTML content, as well as upload images.
@@ -491,6 +364,132 @@ By default, the component uses HEX format:
 ColorPicker::make('color')
 ```
 
+## Fields Options
+
+Filament provides number of option to alter fields inside the form
+
+### Setting a label
+
+By default, the label of the field will be automatically determined based on its name. To override the field's label, you may use the `label()` method.
+
+```php
+TextInput::make('name')->label(__('fields.name'))
+```
+
+Optionally, you can have the label automatically translated by using the `translateLabel()` method:
+
+```php
+TextInput::make('name')->translateLabel() // Equivalent to `label(__('Name'))`
+```
+
+### Setting an ID
+
+In the same way as labels, field IDs are also automatically determined based on their names. To override a field ID, use the `id()` method:
+
+```php
+TextInput::make('name')->id('name-field')
+```
+
+### Validation attributes
+
+When fields fail validation, their label is used in the error message. To customize the label used in field error messages, use the `validationAttribute()` method:
+
+```php
+TextInput::make('name')->validationAttribute('full name')
+```
+
+### Setting a default value
+
+To define a default value, use the `default()` method:
+
+```php
+TextInput::make('name')->default('John')
+```
+
+### Helper messages and hints
+
+Sometimes, you may wish to provide extra information for the user of the form. For this purpose, you may use helper messages and hints.
+
+Help messages are displayed below the field. The `helperText()` method supports Markdown formatting:
+
+```php
+TextInput::make('name')->helperText('Your full name here, including any middle names.')
+```
+
+Hints can be used to display text adjacent to its label:
+
+```php
+TextInput::make('password')->hint('[Forgotten your password?](forgotten-password)')
+```
+
+Hints may also have an icon rendered next to them:
+
+```php
+RichEditor::make('content')
+    ->hint('Translatable')
+    ->hintIcon('heroicon-s-translate')
+```
+
+### Custom attributes
+
+The HTML attributes of the field's wrapper can be customized by passing an array of `extraAttributes()`:
+
+```php
+TextInput::make('name')->extraAttributes(['title' => 'Text input'])
+```
+
+To add additional HTML attributes to the input itself, use `extraInputAttributes()`:
+
+```php
+TextInput::make('points')
+    ->numeric()
+    ->extraInputAttributes(['step' => '10'])
+```
+
+### Disabling
+
+You may disable a field to prevent it from being edited:
+
+```php
+TextInput::make('name')->disabled()
+```
+
+Optionally, you may pass a boolean value to control if the field should be disabled or not:
+
+```php
+Toggle::make('is_admin')->disabled(! auth()->user()->isAdmin())
+```
+
+To prevent a field from being saved, use the `dehydrated(false)` method:
+
+```php
+Toggle::make('is_admin')->dehydrated(false)
+```
+
+Alternatively, you may only want to save a field conditionally, maybe if the user is an admin:
+
+```php
+Toggle::make('is_admin')
+    ->disabled(! auth()->user()->isAdmin())
+    ->dehydrated(auth()->user()->isAdmin())
+```
+
+### Autofocusing
+
+Most fields will be autofocusable. Typically, you should aim for the first significant field in your form to be autofocused for the best user experience.
+
+```php
+TextInput::make('name')->autofocus()
+```
+
+### Setting a placeholder
+
+Many fields will also include a placeholder value for when it has no value. You may customize this using the `placeholder()` method:
+
+```php
+TextInput::make('name')->placeholder('John Doe')
+```
+
 ## Advanced Fields
 
 ### Repeater
@@ -512,7 +511,7 @@ Repeater::make('members')
     ->columns(2)
 ```
 
-We recommend that you store repeater data with a `JSON` column in your database. Additionally, if you're using Eloquent, make sure that column has an `array` cast.
+It’s recommended store repeater data with a `JSON` column in your database. Additionally, if you're using Eloquent, make sure that column has an `array` cast.
 
 **Options**
 
@@ -557,6 +556,16 @@ You may allow repeater items to be duplicated using the `cloneable()` method:
 ->cloneable()
 ```
 
+****Ordering items in Repeater****
+
+By default, ordering relationship repeater items is disabled. This is because your related model needs an `sort` column to store the order of related records. To enable ordering, you may use the `orderable()` method:
+
+```php
+->orderable() // we can pass column name
+```
+
+This assumes that your related model has a `sort` column.
+
 **Grid Layout**
 
 You may organize repeater items into columns by using the `grid()` method:
@@ -567,7 +576,7 @@ You may organize repeater items into columns by using the `grid()` method:
 
 **Access Parent Values**
 
-All form components are able to **[use `$get()` and `$set()`](https://filamentphp.com/docs/2.x/forms/advanced)** to access another field's value. However, you might experience unexpected behaviour when using this inside the repeater's schema.
+All form components are able to **[use `$get()` and `$set()`](https://filamentphp.com/docs/2.x/forms/advanced)** to access another field's value. However, you might experience unexpected behavior when using this inside the repeater's schema.
 
 This is because `$get()` and `$set()`, by default, are scoped to the current repeater item. This means that you are able to interact with another field inside that repeater item easily without knowing which repeater item the current form component belongs to.
 
@@ -598,84 +607,53 @@ You can use `../` to go up a level in the data structure, so `$get('../client
 
 Similar to a **[repeater](https://filamentphp.com/docs/2.x/forms/fields#repeater)**, the builder component allows you to output a JSON array of repeated form components. Unlike the repeater, which only defines one form schema to repeat, the builder allows you to define different schema "blocks", which you can repeat in any order. This makes it useful for building more advanced array structures.
 
-The primary use of the builder component is to build web page content using predefined blocks. The example below defines multiple blocks for different elements in the page content. On the frontend of your website, you could loop through each block in the JSON and format it how you wish.
+Full details on how to use the builder [here](https://filamentphp.com/docs/2.x/forms/fields#builder)
+
+## Advanced Field Functions
+
+### Use Callback to Fetch Select **or MutliSelect** Options
+
+If you have lots of options and want to populate them based on a database search or other external data source, you can use the `getSearchResultsUsing()` and `getOptionLabelUsing()` methods instead of `options()`. The `getSearchResultsUsing()` method accepts a callback that returns search results in `$key => $value` format.
+
+The `getOptionLabelUsing()` method accepts a callback that transforms the selected option `$value` into a label.
 
 ```php
-Builder::make('content')
-    ->blocks([
-        Builder\Block::make('heading')
-            ->schema([
-                TextInput::make('content')
-                    ->label('Heading')
-                    ->required(),
-                Select::make('level')
-                    ->options([
-                        'h1' => 'Heading 1',
-                        'h2' => 'Heading 2',
-                        'h3' => 'Heading 3',
-                        'h4' => 'Heading 4',
-                        'h5' => 'Heading 5',
-                        'h6' => 'Heading 6',
-                    ])
-                    ->required(),
-            ]),
-        Builder\Block::make('paragraph')
-            ->schema([
-                MarkdownEditor::make('content')
-                    ->label('Paragraph')
-                    ->required(),
-            ]),
-        Builder\Block::make('image')
-            ->schema([
-                FileUpload::make('url')
-                    ->label('Image')
-                    ->image()
-                    ->required(),
-                TextInput::make('alt')
-                    ->label('Alt text')
-                    ->required(),
-            ]),
-    ])
+Select::make('authorId')
+    ->searchable()
+    ->getSearchResultsUsing(fn (string $search) => User::where('name', 'like', "%{$search}%")->limit(50)->pluck('name', 'id'))
+    ->getOptionLabelUsing(fn ($value): ?string => User::find($value)?->name),
+
 ```
 
-We recommend that you store builder data with a JSON column in your database. Additionally, if you're using Eloquent, make sure that column has an array cast.
+### Create Parent’s Option From within the child’s Select
 
-As evident in the above example, blocks can be defined within the blocks() method of the component. Blocks are Builder\Block objects, and require a unique name, and a component schema:
+You may define a custom form that can be used to create a new record and attach it to the `BelongsTo` relationship:
 
 ```php
-Builder::make('content')
-    ->blocks([
-        Builder\Block::make('heading')
-            ->schema([
-                TextInput::make('content')->required(),
-                // ...
-            ]),
-        // ...
-    ])
+
+Select::make('authorId')
+    ->relationship('author', 'name')
+    ->createOptionForm([
+        Forms\Components\TextInput::make('name')
+            ->required(),
+    ]),
 ```
 
-**Options**
+The form opens in a modal, where the user can fill it with data. Upon form submission, the new record is selected by the field.
 
-Builder has multiple options to manipulate
+### **Dependent selects**
 
-```php
-Builder\Block::make('heading')
-/* Add translatable label */
-		->label(__('blocks.heading'))
-/* Add icon */
-		->icon('heroicon-o-bookmark')
-/* Min and Max Items */
-    ->minItems(1)
-    ->maxItems(10)
-```
+Commonly, you may desire "dependant" select inputs, which populate their options based on the state of another.
+
+[https://www.youtube.com/watch?time_continue=2&v=W_eNyimRi3w&feature=emb_logo](https://www.youtube.com/watch?time_continue=2&v=W_eNyimRi3w&feature=emb_logo)
 
 # Layout
-
-## Layout Options
 
 Layout component classes can be found in the `Filament\Form\Components` namespace.
 
 They reside within the schema of your form, alongside any fields
+
+## Layout Options
 
 ### Columns
 
@@ -805,6 +783,8 @@ Wizard::make([
 	->skippable()
 ```
 
+We can render a button or view on the last step, [details here](https://filamentphp.com/docs/2.x/forms/layout#wizard)
+
 ### Section
 
 You may want to separate your fields into sections, each with a heading and description. To do this, you can use a section component:
@@ -861,7 +841,49 @@ Inside your view, you may render the component's schema() using the $getChildCom
 </div>
 ```
 
-# Advanced
+# Validation
+
+Validation rules may be added to any **[field](https://filamentphp.com/docs/2.x/forms/fields)**.
+
+Filament includes several **[dedicated validation methods](https://filamentphp.com/docs/2.x/forms/validation#available-rules)**, but you can also use any **[other Laravel validation rules](https://filamentphp.com/docs/2.x/forms/validation#other-rules)**, including **[custom validation rules](https://filamentphp.com/docs/2.x/forms/validation#custom-rules)**
+
+## Available Rules
+
+Full List of All validation Rules Here [https://filamentphp.com/docs/2.x/forms/validation#available-rules](https://filamentphp.com/docs/2.x/forms/validation#available-rules)
+
+## Other Rules
+
+You may add other validation rules to any field using the `rules()` method:
+
+```php
+TextInput::make('slug')->rules(['alpha_dash'])
+```
+
+A full list of validation rules may be found in the **[Laravel documentation](https://laravel.com/docs/validation#available-validation-rules)**.
+
+## Custom Rules
+
+You may use any custom validation rules as you would do in **[Laravel](https://laravel.com/docs/validation#custom-validation-rules)**:
+
+```php
+TextInput::make('slug')->rules([new Uppercase()])
+```
+
+You may also use **[closure rules](https://laravel.com/docs/validation#using-closures)**:
+
+```php
+TextInput::make('slug')->rules([
+    function () {
+        return function (string $attribute, $value, Closure $fail) {
+            if ($value === 'foo') {
+                $fail("The {$attribute} is invalid.");
+            }
+        };
+    },
+])
+```
+
+# Advanced Topics
 
 ## Change Field or Layout Globally
 
@@ -913,44 +935,24 @@ protected function getRedirectUrl(): string
 > This function will be added to the create or edit resource pages
 >
 
-# Validation
+## Building View
 
-Validation rules may be added to any **[field](https://filamentphp.com/docs/2.x/forms/fields)**.
+Aside from building custom fields, you may create "view" fields which allow you to create custom fields without extra PHP classes.
 
-Filament includes several **[dedicated validation methods](https://filamentphp.com/docs/2.x/forms/validation#available-rules)**, but you can also use any **[other Laravel validation rules](https://filamentphp.com/docs/2.x/forms/validation#other-rules)**, including **[custom validation rules](https://filamentphp.com/docs/2.x/forms/validation#custom-rules)**
+[Details Here](https://filamentphp.com/docs/2.x/forms/fields#view)
 
-## Available Rules
+## Building Custom Fields
 
-Full List of All validation Rules Here [https://filamentphp.com/docs/2.x/forms/validation#available-rules](https://filamentphp.com/docs/2.x/forms/validation#available-rules)
+You may create your own custom field classes and views, which you can reuse across your project, and even release as a plugin to the community. [Details Here](https://filamentphp.com/docs/2.x/forms/fields#building-custom-fields)
 
-## Other Rules
+## Building Custom Layout Components
 
-You may add other validation rules to any field using the `rules()` method:
+You may create your own custom component classes and views, which you can reuse across your project, and even release as a plugin to the community. [Details here](https://filamentphp.com/docs/2.x/forms/layout#building-custom-layout-components)
 
-```php
-TextInput::make('slug')->rules(['alpha_dash'])
-```
+## Sending Validation Notifications
 
-A full list of validation rules may be found in the **[Laravel documentation](https://laravel.com/docs/validation#available-validation-rules)**.
+If you want to send a notification when validation error occurs, you may do so by using the `onValidationError()` method on your Livewire component, more [details here](https://filamentphp.com/docs/2.x/forms/validation#sending-validation-notiications)
 
-## Custom Rules
+## Other Advanced Topics
 
-You may use any custom validation rules as you would do in **[Laravel](https://laravel.com/docs/validation#custom-validation-rules)**:
-
-```php
-TextInput::make('slug')->rules([new Uppercase()])
-```
-
-You may also use **[closure rules](https://laravel.com/docs/validation#using-closures)**:
-
-```php
-TextInput::make('slug')->rules([
-    function () {
-        return function (string $attribute, $value, Closure $fail) {
-            if ($value === 'foo') {
-                $fail("The {$attribute} is invalid.");
-            }
-        };
-    },
-])
-```
+Filament has a full section for advanced topics can be found [here](https://filamentphp.com/docs/2.x/forms/advanced)

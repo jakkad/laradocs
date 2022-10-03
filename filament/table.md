@@ -29,6 +29,20 @@ public static function table(Table $table): Table
 
 ## Table Options
 
+### Access Relationship’s fields
+
+You may use "dot syntax" to access columns within relationships. The name of the relationship comes first, followed by a period, followed by the name of the column to display:
+
+```php
+TextColumn::make('author.name')
+/* Number of related records */
+->counts('users')
+/* Check if relationship exist */
+->exists('users')
+/* Relationship Aggregating: avg(), max(), min(), sum() */
+->avg('users', 'age')
+```
+
 ### Reordering Records
 
 To allow the user to reorder records using drag and drop in your table, you can use the `reorderable()` method:
@@ -52,186 +66,9 @@ You may poll table content so that it refreshes at a set interval, using the `p
       ->poll('10s');
 ```
 
-### Access Relationship’s fields
-
-You may use "dot syntax" to access columns within relationships. The name of the relationship comes first, followed by a period, followed by the name of the column to display:
-
-```php
-TextColumn::make('author.name')
-/* Number of related records */
-->counts('users')
-/* Check if relationship exist */
-->exists('users')
-/* Relationship Aggregating: avg(), max(), min(), sum() */
-->avg('users', 'age')
-```
-
 # Columns
 
-## Columns Options
-
-Columns may be created using the static `make()` method, passing its name. The name of the column should correspond to a column or accessor on your model. You may use "dot syntax" to access columns within relationships.
-
-```php
-TextColumn::make('title')
-```
-
-### Setting a Label
-
-By default, the label of the column, which is displayed in the header of the table, is generated from the name of the column. You may customize this using the `label()` method:
-
-```php
-TextColumn::make('title')->label('Post title')
-/* Automatically load translated label */
-->translateLabel()
-```
-
-### Sorting
-
-Columns may be sortable, by clicking on the column label. To make a column sortable, you must use the `sortable()` method:
-
-```php
-TextColumn::make('title')->sortable()
-```
-
-custom sort is available [here](https://filamentphp.com/docs/2.x/tables/columns/getting-started#sorting)
-
-**Sorting column by default**
-
-We add it to the table function
-
-```php
-->defaultSort('name');
-```
-
-### Searching
-
-Columns may be searchable, by using the text input in the top right of the table. To make a column searchable, you must use the `searchable()` method:
-
-```php
-TextColumn::make('title')->searchable()
-/* Create individual search */
-->searchable(isIndividual: true)
-/* Stop global search */
-->searchable(isIndividual: true, isGlobal: false)
-
-```
-
-### Cell Actions and URLs
-
-When a cell is clicked, you may run an "action", or open a URL.
-
-**Running Actions**
-
-To run an action, you may use the `action()` method, passing a callback or the name of a Livewire method to run. Each method accepts a `$record` parameter which you may use to customize the behaviour of the action:
-
-```php
-TextColumn::make('title')
-    ->action(function (Post $record): void {
-        $this->dispatchBrowserEvent('open-post-edit-modal', [
-            'post' => $record->getKey(),
-        ]);
-    })
-```
-
-**Action Modals**
-
-You may open **[action modals](https://filamentphp.com/docs/2.x/tables/columns/actions#modals)** by passing in an `Action` object to the `action()` method:
-
-```php
-TextColumn::make('title')
-    ->action(
-        Action::make('select')
-            ->requiresConfirmation()
-            ->action(function (Post $record): void {
-                $this->dispatchBrowserEvent('select-post', [
-                    'post' => $record->getKey(),
-                ]);
-            }),
-    )
-```
-
-Action objects passed into the `action()` method must have a unique name to distinguish it from other actions within the table.
-
-**Opening URLs**
-
-To open a URL, you may use the `url()` method, passing a callback or static URL to open. Callbacks accept a `$record` parameter which you may use to customize the URL:
-
-```php
-TextColumn::make('title')
-    ->url(fn (Post $record): string => route('posts.edit', ['post' => $record]))
-/* Can be opened in a New Tab */
-		->openUrlInNewTab()
-```
-
-### Setting a default value
-
-To set a default value for fields with a `null` state, you may use the `default()` method:
-
-```php
-TextColumn::make('title')->default('Untitled')
-```
-
-### Hiding Columns
-
-To hide a column conditionally, you may use the `hidden()` and `visible()` methods, whichever you prefer:
-
-```php
-TextColumn::make('role')->hidden(! auth()->user()->isAdmin())
-/* Toggle Column Visibility */
-->toggleable()
-/* Hide By Default */
-->toggleable(isToggledHiddenByDefault: true)
-```
-
-### Tooltips
-
-You may specify a tooltip to display when you hover over a cell:
-
-```php
-TextColumn::make('title')
-    ->tooltip('Title')
-/* Use closure to access current table record */
-    ->tooltip(fn (Model $record): string => "By {$record->author->name}")
-```
-
-### Custom Attributes
-
-The HTML of columns can be customized, by passing an array of `extraAttributes()`:
-
-```php
-TextColumn::make('slug')->extraAttributes(['class' => 'bg-gray-200'])
-```
-
-### Global Settings
-
-If you wish to change the default behaviour of all columns globally, then you can call the static `configureUsing()` method inside a service provider's `boot()` method, to which you pass a Closure to modify the columns using. For example, if you wish to make all columns **`[sortable()](https://filamentphp.com/docs/2.x/tables/columns/getting-started#sorting)`** and **`[toggleable()](https://filamentphp.com/docs/2.x/tables/columns/getting-started#toggling-column-visibility)`**, you can do it like so:
-
-```php
-Column::configureUsing(function (Column $column): void {
-    $column
-        ->toggleable()
-        ->sortable();
-});
-```
-
-Additionally, you can call this code on specific column types as well:
-
-```php
-BooleanColumn::configureUsing(function (BooleanColumn $column): void {
-    $column
-        ->toggleable()
-        ->sortable();
-});
-```
-
-Of course, you are still able to overwrite this on each column individually:
-
-```php
-BooleanColumn::make('is_admin')->toggleable(false)
-```
-
-## Column Types
+## Simple Columns
 
 ### Text Column
 
@@ -258,6 +95,8 @@ TextColumn::make('title')
 /* Cutsom Format */
 ->formatStateUsing(fn (string $state): string => __("statuses.{$state}"))
 ```
+
+Custom formatting is also [available here](https://filamentphp.com/docs/2.x/tables/columns/text#custom-formatting)
 
 Also we have option to customize style
 
@@ -349,7 +188,8 @@ BadgeColumn::make('status')
     ])
 ```
 
-Badges can take same state and color options as icon column, but we have the option to dynamically calculate state
+> Badges can take same state and color options as icon column, but we have the option to dynamically calculate state
+>
 
 ```php
 BadgeColumn::make('status')
@@ -397,6 +237,10 @@ ColorColumn::make('color')
     ->copyMessage('Color code copied')
     ->copyMessageDuration(1500)
 ```
+
+## Input Columns
+
+Input Columns allows us to change the column value directly from the table.
 
 ### Select Column
 
@@ -446,6 +290,124 @@ The checkbox column allows you to render a checkbox inside the table, which can 
 CheckboxColumn::make('is_admin')
 ```
 
+## Columns Options
+
+### Setting a Label
+
+By default, the label of the column, which is displayed in the header of the table, is generated from the name of the column. You may customize this using the `label()` method:
+
+```php
+TextColumn::make('title')->label('Post title')
+/* Automatically load translated label */
+->translateLabel()
+```
+
+### Sorting
+
+Columns may be sortable, by clicking on the column label. To make a column sortable, you must use the `sortable()` method:
+
+```php
+TextColumn::make('title')->sortable()
+```
+
+> custom sort is available [here](https://filamentphp.com/docs/2.x/tables/columns/getting-started#sorting)
+>
+
+**Sorting column by default**
+
+We add it to the table function
+
+```php
+->defaultSort('name');
+```
+
+### Searching
+
+Columns may be searchable, by using the text input in the top right of the table. To make a column searchable, you must use the `searchable()` method:
+
+```php
+TextColumn::make('title')->searchable()
+/* Create individual search */
+->searchable(isIndividual: true)
+/* Stop global search */
+->searchable(isIndividual: true, isGlobal: false)
+
+```
+
+> Custom Search is available [here](https://filamentphp.com/docs/2.x/tables/columns/getting-started#searching)
+>
+
+### Cell Actions and URLs
+
+When a cell is clicked, you may run an "action", or open a URL. [More details here](https://filamentphp.com/docs/2.x/tables/columns/getting-started#cell-actions-and-urls)
+
+### Setting a default value
+
+To set a default value for fields with a `null` state, you may use the `default()` method:
+
+```php
+TextColumn::make('title')->default('Untitled')
+```
+
+### Hiding Columns
+
+To hide a column conditionally, you may use the `hidden()` and `visible()` methods, whichever you prefer:
+
+```php
+TextColumn::make('role')->hidden(! auth()->user()->isAdmin())
+/* Toggle Column Visibility */
+->toggleable()
+/* Hide By Default */
+->toggleable(isToggledHiddenByDefault: true)
+```
+
+### Tooltips
+
+You may specify a tooltip to display when you hover over a cell:
+
+```php
+TextColumn::make('title')
+    ->tooltip('Title')
+/* Use closure to access current table record */
+    ->tooltip(fn (Model $record): string => "By {$record->author->name}")
+```
+
+### Custom Attributes
+
+The HTML of columns can be customized, by passing an array of `extraAttributes()`:
+
+```php
+TextColumn::make('slug')->extraAttributes(['class' => 'bg-gray-200'])
+```
+
+### Global Settings
+
+If you wish to change the default behaviour of all columns globally, then you can call the static `configureUsing()` method inside a service provider's `boot()` method, to which you pass a Closure to modify the columns using. For example, if you wish to make all columns **`[sortable()](https://filamentphp.com/docs/2.x/tables/columns/getting-started#sorting)`** and **`[toggleable()](https://filamentphp.com/docs/2.x/tables/columns/getting-started#toggling-column-visibility)`**, you can do it like so:
+
+```php
+Column::configureUsing(function (Column $column): void {
+    $column
+        ->toggleable()
+        ->sortable();
+});
+```
+
+Additionally, you can call this code on specific column types as well:
+
+```php
+BooleanColumn::configureUsing(function (BooleanColumn $column): void {
+    $column
+        ->toggleable()
+        ->sortable();
+});
+```
+
+Of course, you are still able to overwrite this on each column individually:
+
+```php
+BooleanColumn::make('is_admin')->toggleable(false)
+```
+
 # Filters
 
 Filters allow you to scope the Eloquent query as a way to reduce the number of records in a table.
@@ -469,6 +431,8 @@ Filter::make('is_featured')
 
 ## Filter Options
 
+### Basic Options
+
 Similar to all other components in Filament, we can modify a number of label’s options
 
 ```php
@@ -478,9 +442,24 @@ Filter::make('is_featured')->label('Featured') // change label
 ->default() // set a filter to be enabled by default
 ```
 
-## Select / MultiSelect filters
+### Persist Filters in Session
+
+To persist the table filters in the user's session, use the `shouldPersistTableFiltersInSession()` method:
+
+```php
+protected function shouldPersistTableFiltersInSession(): bool
+{
+    return true;
+}
+```
+
+## Filter Types
 
 By default, filters have two states: enabled and disabled. When the filter is enabled, it is applied to the query. When it is disabled it is not. This is controlled through a checkbox. However, some filters may require extra data input to narrow down the results further. You may use a custom filter form to collect this data.
+
+### Select / MultiSelect filters
+
+Select filters allow you to quickly create a filter that allows the user to select an option to apply the filter to their table. For example, a status filter may present the user with a few status options to pick from and filter the table using:
 
 ```php
 SelectFilter::make('status') // or MultiSelectFilter
@@ -493,7 +472,7 @@ SelectFilter::make('status') // or MultiSelectFilter
     ->attribute('status_id')
 ```
 
-## Relationship Select Filters
+### Relationship Select Filters
 
 Select filters are also able to automatically populate themselves based on a `BelongsTo` relationship. For example, if your table has a `author` relationship with a `name` column, you may use `relationship()` to filter the records belonging to an author:
 
@@ -504,7 +483,7 @@ SelectFilter::make('author')->relationship('author', 'name') // or MultiSelect
 ->relationship('author', 'name', fn (Builder $query) => $query->withTrashed())
 ```
 
-## Ternary Filters
+### Ternary Filters
 
 Ternary filters allow you to quickly create a filter which has three states - usually true, false and blank. To filter a column named `is_admin` to be `true` or `false`, you may use the ternary filter:
 
@@ -530,35 +509,9 @@ TernaryFilter::make('email_verified_at')
     )
 ```
 
-## Custom Filter Forms
+### Custom Filter Forms
 
-You may use components from the **[Form Builder](https://filamentphp.com/docs/forms/fields)** to create custom filter forms. The data from the custom filter form is available in the `$data` array of the `query()` callback:
-
-```php
-Filter::make('created_at')
-    ->form([
-        Forms\Components\DatePicker::make('created_from'),
-        Forms\Components\DatePicker::make('created_until'),
-    ])
-    ->query(function (Builder $query, array $data): Builder {
-        return $query
-            ->when(
-                $data['created_from'],
-                fn (Builder $query, $date): Builder => $query->whereDate('created_at', '>=', $date),
-            )
-            ->when(
-                $data['created_until'],
-                fn (Builder $query, $date): Builder => $query->whereDate('created_at', '<=', $date),
-            );
-    })
-
-/* Set default Value */
-Filter::make('created_at')
-    ->form([
-        Forms\Components\DatePicker::make('created_from'),
-        Forms\Components\DatePicker::make('created_until')->default(now()),
-    ])
-```
+You may use components from the **[Form Builder](https://filamentphp.com/docs/forms/fields)** to create custom filter forms. [More info Here](https://filamentphp.com/docs/2.x/tables/filters#custom-filter-forms)
 
 ## Indicators
 
@@ -576,50 +529,13 @@ TernaryFilter::make('is_admin')
 
 ### Custom Indicators
 
-Not all indicators are simple, so you may need to use `indicateUsing()` to customize which indicators should be shown at any time.
-
-For example, if you have a custom date filter, you may create a custom indicator that formats the selected date:
-
-```php
-Filter::make('created_at')
-    ->form([DatePicker::make('date')])
-    // ...
-    ->indicateUsing(function (array $data): ?string {
-        if (! $data['date']) {
-            return null;
-        }
- 
-        return 'Created at ' . Carbon::parse($data['date'])->toFormattedDateString();
-    })
-```
-
-You may even render multiple indicators at once, by returning an array. If you have different fields associated with different indicators, you should use the field's name as the array key, to ensure that the correct field is reset when the filter is removed:
-
-```php
-Filter::make('created_at')
-    ->form([
-        DatePicker::make('from'),
-        DatePicker::make('until'),
-    ])
-    // ...
-    ->indicateUsing(function (array $data): array {
-        $indicators = [];
- 
-        if ($data['from'] ?? null) {
-            $indicators['from'] = 'Created from ' . Carbon::parse($data['from'])->toFormattedDateString();
-        }
- 
-        if ($data['until'] ?? null) {
-            $indicators['until'] = 'Created until ' . Carbon::parse($data['until'])->toFormattedDateString();
-        }
- 
-        return $indicators;
-    })
-```
+Not all indicators are simple, so you may need to use `indicateUsing()` to customize which indicators should be shown at any time. To learn more about custom indicator [check here](https://filamentphp.com/docs/2.x/tables/filters#custom-indicators)
 
 ## Appearance
 
 By default, filters are displayed in a thin popover on the right side of the table, in 1 column.
+
+### Size
 
 To change the number of columns that filters may occupy, you may use the `getTableFiltersFormColumns()` method:
 
@@ -639,61 +555,61 @@ protected function getTableFiltersFormWidth(): string
 }
 ```
 
-## ****Displaying filters above or below the table content****
+### Position
 
 To render the filters above the table content instead of in a popover, you may use:
 
 ```php
 protected function getTableFiltersLayout(): ?string
 {
-    return Layout::AboveContent;
+    return Layout::AboveContent; // or BellowContent
+
 }
+
+// Or inside the table
+->filters(
+    [
+        // ...
+    ],
+    layout: Layout::BelowContent, // or AboveContent
 ```
 
 To render the filters below the table content instead of in a popover, you may use:
 
-```php
-protected function getTableFiltersLayout(): ?string
-{
-    return Layout::BelowContent;
-}
-```
-
-## Persist Filters in Session
-
-To persist the table filters in the user's session, use the `shouldPersistTableFiltersInSession()` method:
-
-```php
-protected function shouldPersistTableFiltersInSession(): bool
-{
-    return true;
-}
-```
-
 # Actions
 
-## Single Actions
+## Action Types
+
+### Single Actions
 
 Single action buttons are rendered at the end of each table row.
 
-Actions may be created using the static `make()` method, passing its name. The name of the action should be unique. You can then pass a callback to `action()` which executes the task, or a callback to `url()` which generates a link URL:
+Basic Actions may be created inside the `Action` section using the static `make()` method, passing its name. The name of the action should be unique. You can then pass a callback to `action()` which executes the task, or a callback to `url()` which generates a link URL:
 
 ```php
-Action::make('edit')
-    ->url(fn (Post $record): string => route('posts.edit', $record))
-    ->openUrlInNewTab()
+->actions([
+           Action::make('edit')
+				    ->url(fn (Post $record): string => route('posts.edit', $record))
+				    ->openUrlInNewTab()
+        ]);
 ```
+
+### Bulk Actions
 
 Bulk action buttons are visible when the user selects at least one record.
 
-Bulk actions may be created using the static `make()` method, passing its name. The name of the action should be unique. You should then pass a callback to `action()` which executes the task:
+Basic Actions may be created inside the `BulkAction` section using the static `make()` method, passing its name. The name of the action should be unique. You can then pass a callback to `action()` which executes the task, or a callback to `url()` which generates a link URL:
 
 ```php
-BulkAction::make('delete')
-    ->action(fn (Collection $records) => $records->each->delete())
+->bulkActions([
+          BulkAction::make('delete')
+				    ->action(fn (Collection $records) => $records->each->delete())
+        ]);
 ```
 
-### Options
+## Action Options
+
+### Basic Options
 
 Actions have multiple options to modify as follows:
 
@@ -702,51 +618,6 @@ Actions have multiple options to modify as follows:
 ->translateLabel() // Translated label
 ->color('danger') // color
 ->icon('heroicon-o-trash') // icon
-```
-
-### ****Confirmation modals****
-
-You may require confirmation before an action is run using the `requiresConfirmation()` method. This is useful for particularly destructive actions, such as those that delete records.
-
-```php
-->requiresConfirmation()
-```
-
-### Custom Forms
-
-You may also render a form in this modal to collect extra information from the user before the action runs. Details [Here](https://filamentphp.com/docs/2.x/tables/actions#custom-forms)
-
-### Authorization
-
-You may conditionally show or hide actions and bulk actions for certain users using either the `visible()` or `hidden()` methods, passing a closure:
-
-```php
-Action::make('edit')
-    ->url(fn (Post $record): string => route('posts.edit', $record))
-    ->visible(fn (Post $record): bool => auth()->user()->can('update', $record))
-```
-
-### Prebuilt Actions
-
-Filament offers the main actions (View, Edit, Delete) as well as a **Replicate Action**
-
-This package includes an action to replicate table records. You may use it like so:
-
-```php
-ReplicateAction::make()
-/* To exclude specific attributes from being replicated */
-->excludeAttributes(['slug'])
-/* Inboke Closure before or after save */
-->beforeReplicaSaved(function (Model $replica): void {
-        // ...
-    })
-->afterReplicaSaved(function (Model $replica): void {
-        // ...
-    })
-/* Show popup for the user to fill in some fields manually */
-->form([
-        TextInput::make('title')->required(),
-    ])
 ```
 
 ### Grouping
@@ -795,22 +666,58 @@ You may specify a tooltip to display when you hover over an action:
 ->tooltip(fn (Model $record): string => "Edit {$record->title}")
 ```
 
-## Bulk Actions
+### Authorization
 
-**[Bulk actions](https://filamentphp.com/docs/2.x/tables/actions#bulk-actions)** are buttons that are rendered in a dropdown in the header of the table. They appear when you select records using the checkboxes at the start of each table row. They allow the user to perform a task on multiple records at once in the table. To learn how to build bulk actions, see the **[full actions documentation](https://filamentphp.com/docs/2.x/tables/actions#bulk-actions)**.
-
-To add bulk actions before the "Delete selected" action, use the `$table->prependBulkActions()` method:
+You may conditionally show or hide actions and bulk actions for certain users using either the `visible()` or `hidden()` methods, passing a closure:
 
 ```php
-->bulkActions([
-            // ...
-            Tables\Actions\BulkAction::make('activate')
-                ->action(fn (Collection $records) => $records->each->activate())
-                ->requiresConfirmation()
-                ->color('success')
-                ->icon('heroicon-o-check'),
-        ]);
+Action::make('edit')
+    ->url(fn (Post $record): string => route('posts.edit', $record))
+    ->visible(fn (Post $record): bool => auth()->user()->can('update', $record))
 ```
+
+## Prebuilt Actions
+
+Filament offers the main actions (View, Edit, Delete) as well as a **Replicate Action**
+
+### Replicate
+
+This package includes an action to replicate table records. You may use it like so:
+
+```php
+ReplicateAction::make()
+/* To exclude specific attributes from being replicated */
+->excludeAttributes(['slug'])
+/* Inboke Closure before or after save */
+->beforeReplicaSaved(function (Model $replica): void {
+        // ...
+    })
+->afterReplicaSaved(function (Model $replica): void {
+        // ...
+    })
+/* Show popup for the user to fill in some fields manually */
+->form([
+        TextInput::make('title')->required(),
+    ])
+```
+
+## Modals
+
+### ****Confirmation modals****
+
+You may require confirmation before an action is run using the `requiresConfirmation()` method. This is useful for particularly destructive actions, such as those that delete records.
+
+```php
+->requiresConfirmation()
+```
+
+### Custom Modals
+
+You may also render a form in this modal to collect extra information from the user before the action runs. [More info Here](https://filamentphp.com/docs/2.x/tables/actions#custom-forms)
+
+### Modal Customization
+
+We can customize the modal and its content, [more info here](https://filamentphp.com/docs/2.x/tables/actions#setting-a-modal-heading-subheading-and-button-label)
 
 # Layout
 
