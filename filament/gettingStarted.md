@@ -28,7 +28,7 @@ After making sure we have did an initial Laravel migration we can create a user
 php artisan make:filament-user
 ```
 
-## ****Publishing configuration****
+## Publishing configuration
 
 If you wish, you may publish the configuration of the package using:
 
@@ -68,7 +68,7 @@ The new resource class lives in `CustomerResource.php`.
 
 The classes in the `Pages` directory represent the individual pages and can be used to customized each page respectively.
 
-### ****Automatically generating forms and tables****
+### Automatically generating forms and tables
 
 We can auto generate forms and index tables based on our table’s fields with the help of  `doctrine/dbal` package which is required to use this functionality:
 
@@ -82,7 +82,7 @@ When creating your resource, you may now use `--generate`:
 php artisan make:filament-resource Customer --generate
 ```
 
-### **Generating a View page**
+### Generating a View page
 
 By default, only List, Create and Edit pages are generated for your resource. If you'd also like a **[View page](https://filamentphp.com/docs/2.x/admin/resources/viewing-records)**, use the `--view` flag:
 
@@ -110,7 +110,7 @@ public static function getPages(): array
 }
 ```
 
-### ****Simple (modal) resources****
+### Simple (modal) resources
 
 Sometimes, your models are simple enough that you only want to manage records on one page, using modals to create, edit and delete records. To generate a simple resource with modals:
 
@@ -123,7 +123,7 @@ Your resource will have a "Manage" page, which is a List page with modals added.
 > Simple resource will have no `getRelations()` method
 >
 
-### ****Handling soft deletes****
+### Handling soft deletes
 
 If you'd like to add functionality to restore, force delete and filter trashed records in your resource, use the `--soft-deletes` flag when generating the resource:
 

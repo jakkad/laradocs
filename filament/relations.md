@@ -4,7 +4,7 @@ Filament provides methods to access and store data through relations, but before
 
 ## BelongsTo
 
-### **Select field**
+### Select field
 
 Filament includes the ability automatically loads options from a `BelongsTo` relationship:
 
@@ -34,7 +34,7 @@ Select::make('authorId')
 > This Can be applied on Select, MultiSelect, Checkbox List, or Repeater
 >
 
-### **Layout Component**
+### Layout Component
 
 We can publish the Parent’s fields in a fieldset inside the edit form of the child table, this can be useful in the edit form mainly
 
@@ -55,7 +55,7 @@ Similar to the Layout component above we can publish the parent’s fields in a 
 
 ## HasMany
 
-### **Relation manager**
+### Relation manager
 
 "Relation managers" in Filament allow admins to list, create, associate, edit, dissociate and delete related records without leaving the resource's Edit page.
 
@@ -63,7 +63,7 @@ The related records are listed in a table, which has buttons to open a modal for
 
 For more information on relation managers, see the **[full documentation](https://filamentphp.com/docs/2.x/admin/resources/relation-managers)**.
 
-### **Repeater**
+### Repeater
 
 If we want to create child records from within the Parent’s form, we could use a **[repeater](https://filamentphp.com/docs/2.x/forms/fields#populating-automatically-from-a-relationship)**:
 
@@ -81,7 +81,7 @@ It’s supported through the **Relation Manager**
 
 ## BelongsToMany
 
-### **Multi-select field**
+### Multi-select field
 
 Filament can automatically load `MultiSelect` options from a `BelongsToMany` relationship:
 
@@ -94,7 +94,7 @@ MultiSelect::make('technologies')
 
 More information about `BelongsToManyMultiSelect` is available in the **[Form docs](https://filamentphp.com/docs/2.x/forms/fields#populating-automatically-from-a-belongstomany-relationship)**.
 
-### **Checkbox list field**
+### Checkbox list field
 
 Filament can automatically load `CheckboxList` options from a `BelongsToMany` relationship:
 

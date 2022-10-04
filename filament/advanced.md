@@ -1,3 +1,19 @@
+# Dashboard
+
+Filament allows you to build dynamic dashboards, comprised of "widget" cards, very easily. [Details](https://filamentphp.com/docs/2.x/admin/dashboard/getting-started)
+
+# Users
+
+By default, all `App\Models\User`s can access Filament locally. To allow them to access Filament in production, you must take a few extra steps to ensure that only the correct users have access to the admin panel. [More details](https://filamentphp.com/docs/2.x/admin/users)
+
+# Plugin Development
+
+Plugins can be used to extend Filament's default behaviour and create reusable modules for use in multiple applications. [Full details here](https://filamentphp.com/docs/2.x/admin/plugins)
+
+# Testing
+
+All examples in this guide will be written using **[Pest](https://pestphp.com/)**. However, you can easily adapt this to a PHPUnit. [Full details on testing](https://filamentphp.com/docs/2.x/admin/testing)
+
 # Customizing Main Functions
 
 ## Listing Records

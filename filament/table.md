@@ -703,7 +703,7 @@ ReplicateAction::make()
 
 ## Modals
 
-### ****Confirmation modals****
+### Confirmation modals
 
 You may require confirmation before an action is run using the `requiresConfirmation()` method. This is useful for particularly destructive actions, such as those that delete records.
 

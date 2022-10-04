@@ -641,7 +641,7 @@ Select::make('authorId')
 
 The form opens in a modal, where the user can fill it with data. Upon form submission, the new record is selected by the field.
 
-### **Dependent selects**
+### Dependent selects
 
 Commonly, you may desire "dependant" select inputs, which populate their options based on the state of another.
 
